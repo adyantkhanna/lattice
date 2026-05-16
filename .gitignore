@@ -36,5 +36,6 @@ yarn-error.log*
 next-env.d.ts
 
 # Lattice
-/data
+/data/*.db
+!/data/.gitkeep
 evals/runs
