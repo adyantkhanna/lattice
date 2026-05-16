@@ -11,7 +11,9 @@ let cachedPacks: TopicPack[] | null = null;
 export async function loadAllPacks(): Promise<TopicPack[]> {
   if (cachedPacks) return cachedPacks;
 
-  const files = (await readdir(PACKS_DIR)).filter((f) => f.endsWith(".yaml") || f.endsWith(".yml"));
+  const files = (await readdir(PACKS_DIR)).filter(
+    (f) => !f.startsWith("_") && (f.endsWith(".yaml") || f.endsWith(".yml")),
+  );
 
   const packs: TopicPack[] = [];
 
