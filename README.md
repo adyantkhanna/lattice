@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lattice
 
-## Getting Started
+**Become an expert on any topic in hours, not months.**
 
-First, run the development server:
+Lattice is an open-source AI research agent that searches curated source
+lists, builds a navigable knowledge tree, and remembers what you already
+know — so every session starts where you left off.
+
+## Why Lattice?
+
+| | ChatGPT/Claude Deep Research | Stanford STORM | **Lattice** |
+|---|---|---|---|
+| Sources | Generic web | Generic web | Curated per topic |
+| Output | Prose report | Wikipedia-style article | Navigable knowledge tree |
+| Memory | None | None | Remembers your expertise |
+| Extensible | No | No | Community Topic Packs |
+
+## Quickstart (local mode)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+git clone https://github.com/your-org/lattice
+cd lattice
+cp .env.example .env.local   # add your ANTHROPIC_API_KEY
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Topic Packs** — community-curated YAML files defining authoritative sources,
+  key people, canonical readings, and open debates for a domain
+- **Curated search** — Exa queries scoped to pack-defined domains; falls back to
+  general web when no sources are configured
+- **Knowledge tree** — collapsible concept graph you can mark as known/learning
+- **Memory of you** — onboarding captures your expertise level; prompts adapt accordingly
+- **Local-first** — runs entirely on your machine with your API key; no accounts required
+- **Self-hostable** — `AUTH_MODE=multi` enables multi-user mode with Auth.js
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+See [CONTRIBUTING.md](CONTRIBUTING.md). The fastest way to contribute is to
+add or improve a [Topic Pack](packs/README.md).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See [docs/roadmap.md](docs/roadmap.md) (coming in M1).
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT — see [LICENSE](LICENSE).

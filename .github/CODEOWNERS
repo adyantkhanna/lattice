@@ -1,0 +1,11 @@
+# Global owners — review all PRs
+* @adyantkhanna
+
+# Pack schema changes require extra review
+/packs/pack.schema.json @adyantkhanna
+
+# Auth code requires review
+/lib/auth/ @adyantkhanna
+
+# CI changes require review
+/.github/workflows/ @adyantkhanna

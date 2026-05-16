@@ -1,0 +1,16 @@
+slug: template
+name: Template Pack
+description: >
+  Copy this file to create a new Topic Pack. Fill in the fields below
+  and submit a PR. See packs/README.md for the full authoring guide.
+maintainers: []
+sources:
+  rss: []
+  twitter_handles: []
+  youtube_channels: []
+  arxiv_categories: []
+  sites: []
+canonical_readings: []
+key_people: []
+glossary: []
+open_debates: []

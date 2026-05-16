@@ -1,0 +1,17 @@
+slug: ai-inference-economics
+name: AI Inference Economics
+description: >
+  The cost structure, pricing dynamics, and business model implications of
+  running large models at scale — token costs, batching, caching, and the
+  race to the floor in inference pricing.
+maintainers: []
+sources:
+  rss: []
+  twitter_handles: []
+  youtube_channels: []
+  arxiv_categories: []
+  sites: []
+canonical_readings: []
+key_people: []
+glossary: []
+open_debates: []

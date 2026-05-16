@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/lattice/pack.schema.json",
+  "title": "TopicPack",
+  "description": "Schema for a Lattice Topic Pack YAML file.",
+  "type": "object",
+  "required": ["slug", "name", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Kebab-case identifier, unique across all packs."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the topic."
+    },
+    "description": {
+      "type": "string",
+      "description": "One-paragraph description of what this pack covers."
+    },
+    "maintainers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "GitHub usernames of pack maintainers."
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rss": { "type": "array", "items": { "type": "string", "format": "uri" } },
+        "twitter_handles": { "type": "array", "items": { "type": "string" } },
+        "youtube_channels": { "type": "array", "items": { "type": "string" } },
+        "arxiv_categories": { "type": "array", "items": { "type": "string" } },
+        "sites": { "type": "array", "items": { "type": "string", "format": "uri" } }
+      }
+    },
+    "canonical_readings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "why"],
+        "additionalProperties": false,
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "why": { "type": "string" }
+        }
+      }
+    },
+    "key_people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "handle": { "type": "string" }
+        }
+      }
+    },
+    "glossary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "definition"],
+        "additionalProperties": false,
+        "properties": {
+          "term": { "type": "string" },
+          "definition": { "type": "string" }
+        }
+      }
+    },
+    "open_debates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["question", "perspectives"],
+        "additionalProperties": false,
+        "properties": {
+          "question": { "type": "string" },
+          "perspectives": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
