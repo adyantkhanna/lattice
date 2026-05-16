@@ -1,0 +1,3 @@
+{"id":"q1","question":"What is the cost per token for Claude Sonnet vs GPT-4o as of mid-2025, and how does batch inference change this?","pack":"ai-inference-economics"}
+{"id":"q2","question":"How does KV-cache impact inference cost and what are the main techniques for managing it?","pack":"ai-inference-economics"}
+{"id":"q3","question":"What is speculative decoding and how much latency reduction does it provide in practice?","pack":"ai-inference-economics"}

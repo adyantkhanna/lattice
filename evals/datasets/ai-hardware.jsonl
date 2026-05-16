@@ -1,0 +1,5 @@
+{"id":"q1","question":"Why is LLM inference often memory-bandwidth-bound rather than compute-bound on modern GPUs?","pack":"ai-hardware"}
+{"id":"q2","question":"What is the difference between HBM2e and HBM3 in terms of bandwidth and how does it affect AI accelerator performance?","pack":"ai-hardware"}
+{"id":"q3","question":"How does the NVIDIA H100 SXM5 compare to the A100 SXM4 for transformer model training, in terms of FLOPs, memory, and interconnect?","pack":"ai-hardware"}
+{"id":"q4","question":"What is NVLink and NVSwitch, and why do they matter for scaling large model training across multiple GPUs?","pack":"ai-hardware"}
+{"id":"q5","question":"Explain the roofline model and how it is used to analyze whether an LLM inference workload is compute-bound or memory-bound.","pack":"ai-hardware"}

@@ -1,6 +1,11 @@
 import type { UIMessage } from "ai";
+import { orchestrate } from "@/lib/agent/orchestrator";
 import { getSession } from "@/lib/auth/session";
-import { createConversation, touchConversation } from "@/lib/db/queries/conversations";
+import {
+  createConversation,
+  getConversationById,
+  touchConversation,
+} from "@/lib/db/queries/conversations";
 import { createMessage } from "@/lib/db/queries/messages";
 import { upsertUser } from "@/lib/db/queries/users";
 import { loadPackBySlug } from "@/lib/pack-loader/load";
@@ -24,26 +29,29 @@ export async function POST(req: Request) {
     return new Response("No user message", { status: 400 });
   }
 
-  const userContent = lastUserMessage.parts
-    .filter((p) => p.type === "text")
-    .map((p) => (p as { type: "text"; text: string }).text)
-    .join("");
+  // UIMessage.parts (AI SDK v6) may not be present when caller sends plain content
+  const userContent =
+    lastUserMessage.parts
+      ?.filter((p) => p.type === "text")
+      .map((p) => (p as { type: "text"; text: string }).text)
+      .join("") ??
+    (lastUserMessage as unknown as { content?: string }).content ??
+    "";
 
-  // Lazy conversation creation: if no conversationId, create one now using
-  // the first 50 chars of the user's message as the title.
+  // Lazy conversation creation: first message creates the conversation.
   if (!conversationId) {
     if (!packSlug) {
       return new Response("packSlug required when conversationId is absent", { status: 400 });
     }
-    const pack = await loadPackBySlug(packSlug);
-    if (!pack) {
-      return new Response("Pack not found", { status: 404 });
-    }
+    const newPack = await loadPackBySlug(packSlug);
+    if (!newPack) return new Response("Pack not found", { status: 404 });
+
     await upsertUser({
       id: session.user.id,
       name: session.user.name,
       email: session.user.email,
     });
+
     const title = userContent.length > 50 ? `${userContent.slice(0, 50)}…` : userContent;
     const conv = await createConversation({
       id: generateId(),
@@ -54,38 +62,63 @@ export async function POST(req: Request) {
     conversationId = conv.id;
   }
 
+  // Save user message
   await createMessage({
     id: generateId(),
     conversationId,
     role: "user",
     content: userContent,
   });
-
   await touchConversation(conversationId);
 
-  const stubText = `[M1 stub] You said: "${userContent}". The real agent (Milestone 2) will search curated sources and synthesise an answer here.`;
+  // Resolve the pack for this conversation
+  const conversation = await getConversationById(conversationId);
+  const pack = conversation ? await loadPackBySlug(conversation.topicPackSlug) : null;
 
-  await createMessage({
-    id: generateId(),
-    conversationId,
-    role: "assistant",
-    content: stubText,
-  });
+  if (!pack) {
+    return new Response("Pack not found for conversation", { status: 404 });
+  }
 
+  // Run the agent
+  const { textStream, sources } = await orchestrate(userContent, pack);
+
+  // Stream response to client while collecting the full text for DB persistence
+  let collectedText = "";
   const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    start(controller) {
-      for (const word of stubText.split(" ")) {
-        controller.enqueue(encoder.encode(`${word} `));
+
+  const responseStream = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of textStream) {
+          collectedText += chunk;
+          controller.enqueue(encoder.encode(chunk));
+        }
+      } catch (e) {
+        console.error("[chat] stream error:", e);
+        const errMsg = "\n\n[Error generating response — please try again.]";
+        collectedText += errMsg;
+        controller.enqueue(encoder.encode(errMsg));
+      } finally {
+        controller.close();
+        // Persist the complete assistant response after the stream ends
+        createMessage({
+          id: generateId(),
+          conversationId: conversationId as string,
+          role: "assistant",
+          content: collectedText,
+        }).catch((e) => console.error("[chat] failed to persist assistant message:", e));
+
+        if (sources.length > 0) {
+          console.info(`[chat] used ${sources.length} sources for "${userContent.slice(0, 40)}"`);
+        }
       }
-      controller.close();
     },
   });
 
-  return new Response(stream, {
+  return new Response(responseStream, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "X-Conversation-Id": conversationId,
+      "X-Conversation-Id": conversationId as string,
     },
   });
 }
