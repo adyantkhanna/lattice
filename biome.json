@@ -40,7 +40,15 @@
     }
   },
   "files": {
-    "includes": ["**", "!node_modules", "!.next", "!data", "!evals/runs", "!*.config.mjs"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!data",
+      "!evals/runs",
+      "!*.config.mjs",
+      "!lib/db/migrations"
+    ]
   },
   "overrides": [
     {
