@@ -6,7 +6,27 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # Never suggest major version bumps — they require deliberate review
+      # and often break the pinned stack (Next 14, Tailwind 3, TS 5, etc.)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
+      prod-deps:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "drizzle-orm"
+          - "next-auth"
+          - "@auth/core"
+          - "ai"
+          - "@anthropic-ai/sdk"
+          - "exa-js"
+          - "@libsql/client"
+          - "ajv"
+          - "ajv-formats"
+          - "yaml"
       dev-deps:
         patterns:
           - "@biomejs/*"
@@ -15,14 +35,15 @@ updates:
           - "drizzle-kit"
           - "lefthook"
           - "typescript"
-      ai-deps:
-        patterns:
-          - "@anthropic-ai/*"
-          - "ai"
-          - "exa-js"
+          - "@types/*"
+          - "postcss"
+          - "tailwindcss"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
       day: monday
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
