@@ -31,4 +31,4 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate all packs
-        run: pnpm tsx scripts/validate-packs.ts
+        run: pnpm exec tsx scripts/validate-packs.ts
