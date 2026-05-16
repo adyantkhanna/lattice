@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/session";
-import { createConversation, getConversationsByUser } from "@/lib/db/queries/conversations";
+import { createConversation, getConversationsWithMessages } from "@/lib/db/queries/conversations";
 import { upsertUser } from "@/lib/db/queries/users";
 import { loadPackBySlug } from "@/lib/pack-loader/load";
 import { generateId } from "@/lib/utils";
 
 export async function GET() {
   const session = await getSession();
-  const conversations = await getConversationsByUser(session.user.id);
+  const conversations = await getConversationsWithMessages(session.user.id);
   return NextResponse.json(conversations);
 }
 
