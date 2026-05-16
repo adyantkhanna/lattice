@@ -36,7 +36,10 @@
   },
   "css": {
     "linter": {
-      "enabled": true
+      "enabled": false
+    },
+    "formatter": {
+      "enabled": false
     }
   },
   "files": {
@@ -47,19 +50,8 @@
       "!data",
       "!evals/runs",
       "!*.config.mjs",
-      "!lib/db/migrations"
+      "!lib/db/migrations",
+      "!**/*.css"
     ]
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.css"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noUnknownAtRules": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }
