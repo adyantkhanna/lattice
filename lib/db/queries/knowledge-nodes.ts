@@ -21,3 +21,23 @@ export async function createKnowledgeNode(data: NewKnowledgeNode): Promise<Knowl
 export async function updateNodeStatus(id: string, status: KnowledgeNode["status"]): Promise<void> {
   await db.update(knowledgeNodes).set({ status }).where(eq(knowledgeNodes.id, id));
 }
+
+/**
+ * Inserts a knowledge node only if no node with the same title already exists
+ * for this user + pack. Prevents duplicate concepts from accumulating.
+ */
+export async function upsertKnowledgeNode(data: NewKnowledgeNode): Promise<void> {
+  const existing = await db.query.knowledgeNodes.findFirst({
+    where: and(
+      eq(knowledgeNodes.userId, data.userId),
+      eq(knowledgeNodes.topicPackSlug, data.topicPackSlug),
+      eq(knowledgeNodes.title, data.title),
+    ),
+  });
+  if (existing) return;
+  try {
+    await db.insert(knowledgeNodes).values(data);
+  } catch {
+    // Race condition — another concurrent request inserted first; ignore
+  }
+}

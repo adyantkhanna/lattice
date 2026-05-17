@@ -28,6 +28,7 @@ export default async function ChatPage({ params }: { params: { conversationId: s
   return (
     <ChatLayout
       conversationId={params.conversationId}
+      packSlug={pack.slug}
       packName={pack.name}
       initialMessages={initialMessages}
     />

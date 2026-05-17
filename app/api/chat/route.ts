@@ -1,4 +1,5 @@
 import type { UIMessage } from "ai";
+import { extractNodes } from "@/lib/agent/extract-nodes";
 import { orchestrate } from "@/lib/agent/orchestrator";
 import { getSession } from "@/lib/auth/session";
 import {
@@ -6,6 +7,7 @@ import {
   getConversationById,
   touchConversation,
 } from "@/lib/db/queries/conversations";
+import { upsertKnowledgeNode } from "@/lib/db/queries/knowledge-nodes";
 import { createMessage } from "@/lib/db/queries/messages";
 import { upsertUser } from "@/lib/db/queries/users";
 import { loadPackBySlug } from "@/lib/pack-loader/load";
@@ -140,6 +142,25 @@ export async function POST(req: Request) {
 
         if (sources.length > 0) {
           console.info(`[chat] used ${sources.length} sources for "${userContent.slice(0, 40)}"`);
+        }
+
+        // Extract knowledge nodes in the background — does not block the response
+        if (sources.length > 0 && conversation) {
+          extractNodes(collectedText, sources)
+            .then(async (nodes) => {
+              for (const node of nodes) {
+                await upsertKnowledgeNode({
+                  id: generateId(),
+                  userId: session.user.id,
+                  topicPackSlug: conversation.topicPackSlug,
+                  title: node.title,
+                  summary: node.summary,
+                  sources: node.sources,
+                });
+              }
+              console.info(`[chat] extracted ${nodes.length} knowledge nodes`);
+            })
+            .catch((e) => console.error("[chat] node extraction failed:", e));
         }
       }
     },

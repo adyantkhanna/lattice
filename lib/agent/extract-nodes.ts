@@ -1,6 +1,20 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { generateObject, jsonSchema } from "ai";
 import type { SourceResult } from "../sources/types";
 import { anthropic } from "./provider";
+
+let cachedPrompt: string | null = null;
+
+async function getPrompt(): Promise<string> {
+  if (!cachedPrompt) {
+    cachedPrompt = await readFile(
+      join(process.cwd(), "lib/agent/prompts/extract-nodes.md"),
+      "utf-8",
+    );
+  }
+  return cachedPrompt;
+}
 
 type KnowledgeNode = {
   title: string;
@@ -30,29 +44,18 @@ const nodesSchema = jsonSchema<{ nodes: KnowledgeNode[] }>({
   additionalProperties: false,
 });
 
-/**
- * Extracts structured knowledge nodes from a synthesized answer for the
- * knowledge tree panel (Milestone 3). Called asynchronously after streaming.
- */
 export async function extractNodes(
   answer: string,
   sources: SourceResult[],
 ): Promise<KnowledgeNode[]> {
+  const systemPrompt = await getPrompt();
   const sourceList = sources.map((s) => `${s.url} — ${s.title}`).join("\n");
 
   const { object } = await generateObject({
     model: anthropic("claude-sonnet-4-6"),
     schema: nodesSchema,
-    prompt: [
-      "Extract the key concepts from this research answer as structured knowledge nodes.",
-      "Each node should capture a distinct concept, mechanism, or insight.",
-      "",
-      "Available source URLs:",
-      sourceList,
-      "",
-      "Answer:",
-      answer,
-    ].join("\n"),
+    system: systemPrompt,
+    prompt: ["Available source URLs:", sourceList, "", "Answer:", answer].join("\n"),
   });
 
   return object.nodes;
