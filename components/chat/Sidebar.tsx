@@ -44,7 +44,7 @@ export default function Sidebar({ currentConversationId }: Props) {
       <nav className="flex-1 overflow-y-auto p-2 space-y-4">
         {Object.entries(groups).map(([slug, convs]) => (
           <div key={slug}>
-            <p className="px-2 py-1 text-xs font-medium uppercase tracking-wide text-muted-foreground truncate">
+            <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60 truncate">
               {slug.replace(/-/g, " ")}
             </p>
             <ul className="space-y-0.5">

@@ -18,7 +18,7 @@ export default function MessageList({ messages, isLoading }: Props) {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+    <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 max-w-3xl mx-auto w-full">
       {messages.length === 0 && !isLoading && (
         <div className="flex h-full items-center justify-center">
           <p className="text-muted-foreground text-sm">Ask anything to get started.</p>
