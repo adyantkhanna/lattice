@@ -3,7 +3,12 @@
 import type { UIMessage } from "ai";
 import ReactMarkdown from "react-markdown";
 
-export default function MessageBubble({ message }: { message: UIMessage }) {
+type Props = {
+  message: UIMessage;
+  onSourceClick?: (title: string, url: string) => void;
+};
+
+export default function MessageBubble({ message, onSourceClick }: Props) {
   const isUser = message.role === "user";
 
   const text = message.parts
@@ -46,16 +51,33 @@ export default function MessageBubble({ message }: { message: UIMessage }) {
       >
         <ReactMarkdown
           components={{
-            a: ({ href, children }) => (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors"
-              >
-                {children}
-              </a>
-            ),
+            a: ({ href, children }) => {
+              const label = typeof children === "string" ? children : "";
+              if (onSourceClick && href) {
+                return (
+                  <a
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSourceClick(label || href, href);
+                    }}
+                    className="text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors cursor-pointer"
+                  >
+                    {children}
+                  </a>
+                );
+              }
+              return (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors"
+                >
+                  {children}
+                </a>
+              );
+            },
           }}
         >
           {text}

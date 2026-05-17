@@ -9,9 +9,10 @@ import MessageList from "./MessageList";
 type Props = {
   packSlug: string;
   onConversationCreated: (id: string) => void;
+  onSourceClick?: (title: string, url: string) => void;
 };
 
-export default function NewChatArea({ packSlug, onConversationCreated }: Props) {
+export default function NewChatArea({ packSlug, onConversationCreated, onSourceClick }: Props) {
   const transport = useMemo(() => {
     // Custom fetch intercepts X-Conversation-Id from the first response and
     // updates the browser URL without a full navigation, keeping the stream alive.
@@ -37,7 +38,7 @@ export default function NewChatArea({ packSlug, onConversationCreated }: Props) 
 
   return (
     <div className="flex flex-1 flex-col min-h-0">
-      <MessageList messages={messages} isLoading={isLoading} />
+      <MessageList messages={messages} isLoading={isLoading} onSourceClick={onSourceClick} />
       <MessageInput onSend={(text) => sendMessage({ text })} isLoading={isLoading} />
     </div>
   );

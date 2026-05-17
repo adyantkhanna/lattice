@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import NewChatArea from "./NewChatArea";
 import Sidebar from "./Sidebar";
+import SourcePreview from "./SourcePreview";
 
 type Props = {
   packSlug: string;
@@ -14,17 +15,22 @@ type Props = {
 };
 
 type SidebarTab = "history" | "knowledge";
+type PreviewSource = { title: string; url: string };
 
 export default function NewChatLayout({ packSlug, packName }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<SidebarTab>("history");
   const [currentConversationId, setCurrentConversationId] = useState("new");
-  // Incremented after a conversation is created to prompt the tree to refetch
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
+  const [previewSource, setPreviewSource] = useState<PreviewSource | null>(null);
 
   const handleConversationCreated = useCallback((id: string) => {
     setCurrentConversationId(id);
     setTreeRefreshKey((k) => k + 1);
+  }, []);
+
+  const handleSourceClick = useCallback((title: string, url: string) => {
+    setPreviewSource((prev) => (prev?.url === url ? null : { title, url }));
   }, []);
 
   const tabHeader = (
@@ -107,8 +113,15 @@ export default function NewChatLayout({ packSlug, packName }: Props) {
           </Button>
           <h1 className="text-sm font-medium truncate">{packName}</h1>
         </header>
-        <NewChatArea packSlug={packSlug} onConversationCreated={handleConversationCreated} />
+        <NewChatArea
+          packSlug={packSlug}
+          onConversationCreated={handleConversationCreated}
+          onSourceClick={handleSourceClick}
+        />
       </div>
+
+      {/* Source preview panel */}
+      <SourcePreview source={previewSource} onClose={() => setPreviewSource(null)} />
     </div>
   );
 }

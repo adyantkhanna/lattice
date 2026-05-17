@@ -1,0 +1,76 @@
+name: Eval Regression
+
+on:
+  schedule:
+    # Nightly at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      pack:
+        description: "Pack slug to evaluate (default: all)"
+        required: false
+        default: ""
+
+jobs:
+  eval:
+    name: Run eval harness
+    runs-on: ubuntu-latest
+
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+      DATABASE_URL: "file:./data/lattice.db"
+      AUTH_MODE: local
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create data directory and run migrations
+        run: |
+          mkdir -p data
+          pnpm db:migrate
+
+      - name: Evaluate ai-hardware
+        if: ${{ github.event.inputs.pack == '' || github.event.inputs.pack == 'ai-hardware' }}
+        run: pnpm eval --pack ai-hardware
+
+      - name: Evaluate ai-inference-economics
+        if: ${{ github.event.inputs.pack == '' || github.event.inputs.pack == 'ai-inference-economics' }}
+        run: pnpm eval --pack ai-inference-economics
+
+      - name: Evaluate vertical-ai-smb
+        if: ${{ github.event.inputs.pack == '' || github.event.inputs.pack == 'vertical-ai-smb' }}
+        run: pnpm eval --pack vertical-ai-smb
+
+      - name: Upload eval reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-reports-${{ github.run_id }}
+          path: evals/runs/
+          retention-days: 30
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## Eval Regression Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for report in evals/runs/*/REPORT.md; do
+            if [ -f "$report" ]; then
+              echo "---" >> $GITHUB_STEP_SUMMARY
+              head -20 "$report" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

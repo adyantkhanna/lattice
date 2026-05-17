@@ -7,9 +7,10 @@ import MessageBubble from "./Message";
 type Props = {
   messages: UIMessage[];
   isLoading: boolean;
+  onSourceClick?: (title: string, url: string) => void;
 };
 
-export default function MessageList({ messages, isLoading }: Props) {
+export default function MessageList({ messages, isLoading, onSourceClick }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: messages is the scroll trigger
@@ -32,7 +33,7 @@ export default function MessageList({ messages, isLoading }: Props) {
         </div>
       )}
       {messages.map((m) => (
-        <MessageBubble key={m.id} message={m} />
+        <MessageBubble key={m.id} message={m} onSourceClick={onSourceClick} />
       ))}
       {isLoading && (
         <div className="flex gap-1 pl-1">

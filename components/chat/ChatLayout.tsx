@@ -2,12 +2,13 @@
 
 import type { UIMessage } from "ai";
 import { PanelLeft } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import KnowledgeTree from "@/components/knowledge-tree/KnowledgeTree";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ChatArea from "./ChatArea";
 import Sidebar from "./Sidebar";
+import SourcePreview from "./SourcePreview";
 
 type Props = {
   conversationId: string;
@@ -17,10 +18,16 @@ type Props = {
 };
 
 type SidebarTab = "history" | "knowledge";
+type PreviewSource = { title: string; url: string };
 
 export default function ChatLayout({ conversationId, packSlug, packName, initialMessages }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<SidebarTab>("history");
+  const [previewSource, setPreviewSource] = useState<PreviewSource | null>(null);
+
+  const handleSourceClick = useCallback((title: string, url: string) => {
+    setPreviewSource((prev) => (prev?.url === url ? null : { title, url }));
+  }, []);
 
   const tabHeader = (
     <div className="flex shrink-0 border-b border-border">
@@ -102,8 +109,15 @@ export default function ChatLayout({ conversationId, packSlug, packName, initial
           </Button>
           <h1 className="text-sm font-medium truncate">{packName}</h1>
         </header>
-        <ChatArea conversationId={conversationId} initialMessages={initialMessages} />
+        <ChatArea
+          conversationId={conversationId}
+          initialMessages={initialMessages}
+          onSourceClick={handleSourceClick}
+        />
       </div>
+
+      {/* Source preview panel */}
+      <SourcePreview source={previewSource} onClose={() => setPreviewSource(null)} />
     </div>
   );
 }
