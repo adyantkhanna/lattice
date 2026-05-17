@@ -44,16 +44,12 @@ export default function NewChatLayout({ packSlug, packName }: Props) {
         />
       )}
 
-      {/* Mobile sidebar */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-30 w-64 border-r border-border bg-background sm:hidden",
-          "transform transition-transform duration-200",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
-        )}
-      >
-        <Sidebar currentConversationId={currentConversationId} />
-      </aside>
+      {/* Mobile sidebar — only mount when open to avoid duplicate /api/conversations fetches */}
+      {sidebarOpen && (
+        <aside className="fixed inset-y-0 left-0 z-30 w-64 border-r border-border bg-background sm:hidden">
+          <Sidebar currentConversationId={currentConversationId} />
+        </aside>
+      )}
 
       {/* Main area */}
       <div className="flex flex-1 flex-col min-w-0">

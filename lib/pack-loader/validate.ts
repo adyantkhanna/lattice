@@ -5,15 +5,15 @@ import type { TopicPack } from "./types";
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 
-let schema: object | null = null;
+let compiledValidate: ReturnType<typeof ajv.compile> | null = null;
 
-async function getSchema(): Promise<object> {
-  if (schema) return schema;
+async function getValidator(): Promise<ReturnType<typeof ajv.compile>> {
+  if (compiledValidate) return compiledValidate;
   const { readFile } = await import("node:fs/promises");
   const { join } = await import("node:path");
   const raw = await readFile(join(process.cwd(), "packs/pack.schema.json"), "utf-8");
-  schema = JSON.parse(raw);
-  return schema as object;
+  compiledValidate = ajv.compile(JSON.parse(raw));
+  return compiledValidate;
 }
 
 export type ValidationResult =
@@ -21,8 +21,7 @@ export type ValidationResult =
   | { valid: false; errors: string[] };
 
 export async function validatePack(data: unknown): Promise<ValidationResult> {
-  const s = await getSchema();
-  const validate = ajv.compile(s);
+  const validate = await getValidator();
   const valid = validate(data);
   if (!valid) {
     const errors = (validate.errors ?? []).map((e) => `${e.instancePath || "root"}: ${e.message}`);

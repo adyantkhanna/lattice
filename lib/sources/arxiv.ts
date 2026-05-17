@@ -22,7 +22,7 @@ export async function arxivSearch(
   const url = `https://export.arxiv.org/api/query?search_query=${q}&max_results=${maxResults}&sortBy=relevance`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(20_000) });
     if (!res.ok) return [];
     const xml = await res.text();
 
