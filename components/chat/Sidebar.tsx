@@ -1,5 +1,6 @@
 "use client";
 
+import { SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Conversation } from "@/lib/db/schema";
@@ -31,14 +32,19 @@ export default function Sidebar({ currentConversationId }: Props) {
   return (
     <div className="flex h-full flex-col bg-background">
       <div className="flex items-center justify-between border-b border-border px-4 py-3 shrink-0">
-        <Link href="/" className="text-sm font-semibold hover:opacity-75 transition-opacity">
+        <Link
+          href="/"
+          className="font-serif text-base font-light tracking-tight hover:opacity-70 transition-opacity"
+        >
           Lattice
         </Link>
         <Link
           href="/"
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted"
+          title="New research"
         >
-          + New
+          <SquarePen className="size-4" />
+          <span className="sr-only">New research</span>
         </Link>
       </div>
       <nav className="flex-1 overflow-y-auto p-2 space-y-4">

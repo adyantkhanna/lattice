@@ -21,7 +21,14 @@ export default function MessageList({ messages, isLoading }: Props) {
     <div className="flex-1 overflow-y-auto px-6 py-8 space-y-8 max-w-3xl mx-auto w-full">
       {messages.length === 0 && !isLoading && (
         <div className="flex h-full items-center justify-center">
-          <p className="text-muted-foreground text-sm">Ask anything to get started.</p>
+          <div className="text-center space-y-2">
+            <p className="font-serif text-2xl font-light text-foreground/80">
+              What do you want to understand?
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Ask a question — the more specific, the better.
+            </p>
+          </div>
         </div>
       )}
       {messages.map((m) => (
