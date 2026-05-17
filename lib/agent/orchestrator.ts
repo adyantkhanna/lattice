@@ -12,7 +12,17 @@ export type OrchestratorResult = {
   sources: SourceResult[];
 };
 
-export async function orchestrate(question: string, pack: TopicPack): Promise<OrchestratorResult> {
+type ExpertiseProfile = {
+  background?: string;
+  level?: string;
+  goals?: string;
+};
+
+export async function orchestrate(
+  question: string,
+  pack: TopicPack,
+  expertiseProfile?: ExpertiseProfile | null,
+): Promise<OrchestratorResult> {
   // Decompose question into sub-queries (fallback to original question on error)
   const subQueries = await decompose(question, pack).catch((e) => {
     console.error("[orchestrator] decompose failed, using original:", e);
@@ -38,6 +48,6 @@ export async function orchestrate(question: string, pack: TopicPack): Promise<Or
     return true;
   });
 
-  const textStream = await synthesize(question, uniqueSources, pack);
+  const textStream = await synthesize(question, uniqueSources, pack, expertiseProfile);
   return { textStream, sources: uniqueSources };
 }

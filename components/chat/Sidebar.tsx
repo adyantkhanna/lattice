@@ -1,6 +1,6 @@
 "use client";
 
-import { SquarePen } from "lucide-react";
+import { Settings, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Conversation } from "@/lib/db/schema";
@@ -47,7 +47,7 @@ export default function Sidebar({ currentConversationId }: Props) {
           <span className="sr-only">New research</span>
         </Link>
       </div>
-      <nav className="flex-1 overflow-y-auto p-2 space-y-4">
+      <nav className="flex-1 overflow-y-auto p-2 space-y-4 pb-0">
         {Object.entries(groups).map(([slug, convs]) => (
           <div key={slug}>
             <p className="px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60 truncate">
@@ -76,6 +76,15 @@ export default function Sidebar({ currentConversationId }: Props) {
           <p className="px-2 text-xs text-muted-foreground">No conversations yet.</p>
         )}
       </nav>
+      <div className="shrink-0 border-t border-border p-2">
+        <Link
+          href="/settings"
+          className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Settings className="size-3.5" />
+          Settings
+        </Link>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,13 @@
-import PackGrid from "@/components/pack-selector/PackGrid";
+import HomeWithOnboarding from "@/components/onboarding/HomeWithOnboarding";
+import { getSession } from "@/lib/auth/session";
+import { getUserById } from "@/lib/db/queries/users";
 import { loadAllPacks } from "@/lib/pack-loader/load";
 
 export default async function HomePage() {
-  const packs = await loadAllPacks();
+  const [packs, session] = await Promise.all([loadAllPacks(), getSession()]);
+  const user = await getUserById(session.user.id);
+  const hasProfile = !!(user?.expertiseProfile && Object.keys(user.expertiseProfile).length > 0);
+
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-8 py-16 sm:py-24">
@@ -13,7 +18,7 @@ export default async function HomePage() {
             and start building your knowledge.
           </p>
         </header>
-        <PackGrid packs={packs} />
+        <HomeWithOnboarding packs={packs} hasProfile={hasProfile} />
       </div>
     </main>
   );

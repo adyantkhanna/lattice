@@ -9,7 +9,7 @@ import {
 } from "@/lib/db/queries/conversations";
 import { upsertKnowledgeNode } from "@/lib/db/queries/knowledge-nodes";
 import { createMessage } from "@/lib/db/queries/messages";
-import { upsertUser } from "@/lib/db/queries/users";
+import { getUserById, upsertUser } from "@/lib/db/queries/users";
 import { loadPackBySlug } from "@/lib/pack-loader/load";
 import type { SourceResult } from "@/lib/sources/types";
 import { generateId } from "@/lib/utils";
@@ -105,8 +105,15 @@ export async function POST(req: Request) {
     return new Response("Pack not found for conversation", { status: 404 });
   }
 
+  // Fetch expertise profile for personalised synthesis
+  const userRecord = await getUserById(session.user.id);
+  const expertiseProfile = userRecord?.expertiseProfile as
+    | { background?: string; level?: string; goals?: string }
+    | null
+    | undefined;
+
   // Run the agent
-  const { textStream, sources } = await orchestrate(userContent, pack);
+  const { textStream, sources } = await orchestrate(userContent, pack, expertiseProfile);
 
   // Stream response to client while collecting the full text for DB persistence
   let collectedText = "";
