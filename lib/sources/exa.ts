@@ -41,6 +41,8 @@ export async function exaSearch(
   try {
     const res = await fetch(`${EXA_BASE}/search`, {
       method: "POST",
+      // cache: 'no-store' bypasses Next.js RSC fetch interception to avoid hangs
+      cache: "no-store",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(12_000),

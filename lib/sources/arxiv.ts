@@ -22,7 +22,12 @@ export async function arxivSearch(
   const url = `https://export.arxiv.org/api/query?search_query=${q}&max_results=${maxResults}&sortBy=relevance`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+    // cache: 'no-store' bypasses Next.js's App Router fetch interception (RSC context),
+    // which otherwise hangs. Raw Node.js fetch to this URL completes in ~500 ms.
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(8_000),
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const xml = await res.text();
 
@@ -35,7 +40,8 @@ export async function arxivSearch(
       return { url: id, title, content: summary, source: "arxiv" as const };
     });
   } catch (e) {
-    console.error("[arxiv] failed:", e);
+    const reason = e instanceof Error ? e.message : String(e);
+    console.warn(`[arxiv] skipped (${reason})`);
     return [];
   }
 }

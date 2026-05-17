@@ -9,9 +9,33 @@ import {
 import { createMessage } from "@/lib/db/queries/messages";
 import { upsertUser } from "@/lib/db/queries/users";
 import { loadPackBySlug } from "@/lib/pack-loader/load";
+import type { SourceResult } from "@/lib/sources/types";
 import { generateId } from "@/lib/utils";
 
 export const runtime = "nodejs";
+
+/**
+ * Builds a markdown references block from sources that were actually cited ([N]) in the text.
+ * Only includes sources whose number appears in the response, keeping the list tight.
+ */
+function buildReferencesBlock(text: string, sources: SourceResult[]): string {
+  const capped = sources.slice(0, 15);
+  const cited = new Set<number>();
+  for (const m of Array.from(text.matchAll(/\[(\d+)\]/g))) {
+    const n = Number.parseInt(m[1], 10);
+    if (n >= 1 && n <= capped.length) cited.add(n);
+  }
+  if (cited.size === 0) return "";
+
+  const lines = Array.from(cited)
+    .sort((a, b) => a - b)
+    .map((n) => {
+      const s = capped[n - 1];
+      return `[${n}] [${s.title}](${s.url})`;
+    });
+
+  return `\n\n---\n\n**References**\n${lines.join("\n")}`;
+}
 
 export async function POST(req: Request) {
   const session = await getSession();
@@ -92,6 +116,12 @@ export async function POST(req: Request) {
         for await (const chunk of textStream) {
           collectedText += chunk;
           controller.enqueue(encoder.encode(chunk));
+        }
+        // Append numbered references for every source the model cited
+        const refs = buildReferencesBlock(collectedText, sources);
+        if (refs) {
+          collectedText += refs;
+          controller.enqueue(encoder.encode(refs));
         }
       } catch (e) {
         console.error("[chat] stream error:", e);

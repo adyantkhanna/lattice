@@ -24,7 +24,23 @@ export default function MessageBubble({ message }: { message: UIMessage }) {
           <p className="whitespace-pre-wrap">{text}</p>
         ) : (
           <div className="[&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-2 [&_ul]:my-2 [&_ol]:my-2 [&_li]:ml-4 [&_li]:list-disc [&_ol>li]:list-decimal [&_h1]:text-base [&_h1]:font-semibold [&_h2]:text-sm [&_h2]:font-semibold [&_code]:bg-background/60 [&_code]:px-1 [&_code]:rounded [&_pre]:bg-background/60 [&_pre]:p-2 [&_pre]:rounded">
-            <ReactMarkdown>{text}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                // Open all links in a new tab; style them so they're clearly clickable
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors"
+                  >
+                    {children}
+                  </a>
+                ),
+              }}
+            >
+              {text}
+            </ReactMarkdown>
           </div>
         )}
       </div>

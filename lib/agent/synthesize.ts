@@ -5,6 +5,7 @@ import type { TopicPack } from "../pack-loader/types";
 import type { SourceResult } from "../sources/types";
 import { anthropic } from "./provider";
 
+// Prompt is loaded lazily and cached for the lifetime of the server process
 let cachedPrompt: string | null = null;
 
 async function getPrompt(): Promise<string> {

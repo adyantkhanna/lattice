@@ -18,6 +18,8 @@ async function fetchFeed(feedUrl: string, query: string): Promise<SourceResult[]
   try {
     const res = await fetch(feedUrl, {
       signal: AbortSignal.timeout(8_000),
+      // cache: 'no-store' bypasses Next.js RSC fetch interception to avoid hangs
+      cache: "no-store",
       headers: { "User-Agent": "Lattice/1.0 (research agent)" },
     });
     if (!res.ok) return [];
