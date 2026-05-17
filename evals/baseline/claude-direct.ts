@@ -1,5 +1,5 @@
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
+import { anthropic } from "../../lib/agent/provider";
 
 /**
  * Vanilla Sonnet 4.6 baseline — no pack context, no source retrieval.

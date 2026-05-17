@@ -1,6 +1,28 @@
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
+// Load .env.local so the script works without manually exporting env vars
+try {
+  const raw = readFileSync(join(process.cwd(), ".env.local"), "utf-8");
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq < 1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim();
+    if (!process.env[key]) process.env[key] = val;
+  }
+} catch {
+  // .env.local is optional
+}
+
+// Guard against a bare base URL that would misroute API calls (should end in /v1)
+if (process.env.ANTHROPIC_BASE_URL && !process.env.ANTHROPIC_BASE_URL.endsWith("/v1")) {
+  process.env.ANTHROPIC_BASE_URL = `${process.env.ANTHROPIC_BASE_URL.replace(/\/$/, "")}/v1`;
+}
+
 import { orchestrate } from "../lib/agent/orchestrator";
 import { loadPackBySlug } from "../lib/pack-loader/load";
 import { runBaseline } from "./baseline/claude-direct";

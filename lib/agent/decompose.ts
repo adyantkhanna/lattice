@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject, jsonSchema } from "ai";
 import type { TopicPack } from "../pack-loader/types";
+import { anthropic } from "./provider";
 
 let cachedPrompt: string | null = null;
 

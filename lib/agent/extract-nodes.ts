@@ -1,6 +1,6 @@
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject, jsonSchema } from "ai";
 import type { SourceResult } from "../sources/types";
+import { anthropic } from "./provider";
 
 type KnowledgeNode = {
   title: string;

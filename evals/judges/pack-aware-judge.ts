@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateObject, jsonSchema } from "ai";
+import { anthropic } from "../../lib/agent/provider";
 
 const scoreSchema = jsonSchema<{
   accuracy: number;
