@@ -30,7 +30,7 @@
     "@auth/core": "^0.34.3",
     "@base-ui/react": "^1.4.1",
     "@libsql/client": "^0.17.3",
-    "ai": "^6.0.183",
+    "ai": "^6.0.185",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "class-variance-authority": "^0.7.1",
