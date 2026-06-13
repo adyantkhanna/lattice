@@ -42,6 +42,22 @@ const packSlug: string = rawSlug;
 
 type EvalCase = { id: string; question: string; pack: string };
 
+async function safeJudge(question: string, answer: string, packName: string): Promise<EvalScore> {
+  try {
+    return await judge(question, answer, packName);
+  } catch (e) {
+    return {
+      accuracy: 0,
+      citation_quality: 0,
+      source_relevance: 0,
+      specificity: 0,
+      level_calibration: 0,
+      reasoning: `[judge error: ${e}]`,
+      total: 0,
+    };
+  }
+}
+
 function scoreRow(label: string, s: EvalScore): string {
   return `| ${label} | ${s.accuracy} | ${s.citation_quality} | ${s.source_relevance} | ${s.specificity} | ${s.level_calibration} | **${s.total}/25** |`;
 }
@@ -101,8 +117,8 @@ async function main() {
     // Judge both in parallel
     process.stdout.write("  judging…");
     const [agentScore, baselineScore] = await Promise.all([
-      judge(c.question, agentAnswer, pack.name),
-      judge(c.question, baselineAnswer, pack.name),
+      safeJudge(c.question, agentAnswer, pack.name),
+      safeJudge(c.question, baselineAnswer, pack.name),
     ]);
     process.stdout.write(" done\n");
 
